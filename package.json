@@ -1,0 +1,21 @@
+{
+  "name": "backend-EcoQuest",
+  "version": "1.0.0",
+  "description": "servidor backend do aplicativo ecoquest",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/index.js"
+  },
+  "keywords": [
+    "backend",
+    "video",
+    "aula",
+    "gravacao"
+  ],
+  "author": "Marina Freitas",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
