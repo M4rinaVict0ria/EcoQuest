@@ -1,11 +1,11 @@
 {
-  "name": "backend-EcoQuest",
+  "name": "backend-ecoquest",
   "version": "1.0.0",
   "description": "servidor backend do aplicativo ecoquest",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "node src/index.js"
+    "dev": "node --watch --experimental-sqlite --trace-warnings src/index.js"
   },
   "keywords": [
     "backend",
