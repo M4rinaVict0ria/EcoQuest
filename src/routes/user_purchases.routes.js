@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/purchases", PurchaseController.create);
 router.get("/users/:user_id/purchases", PurchaseController.getAll);
-router.delete("/user_purchases/:id", PurchaseController.delete);
+router.delete("/:id", PurchaseController.delete);
 
 export default router;

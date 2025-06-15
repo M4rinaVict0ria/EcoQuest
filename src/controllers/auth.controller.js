@@ -6,7 +6,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'minha_chave_secreta';
 
 export const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, username } = req.body;
 
     const userExists = await db('users').where({ email }).first();
     if (userExists) return res.status(400).json({ message: 'Email já cadastrado.' });
@@ -15,6 +15,7 @@ export const register = async (req, res) => {
     const [userId] = await db('users').insert({
       name,
       email,
+      username,
       password: hashedPassword,
       role: 'user',
       created_at: new Date(),

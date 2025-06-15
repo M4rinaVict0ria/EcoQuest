@@ -16,7 +16,7 @@ import RoutesRewards from './rewards.routes.js';
 import RoutesInsignias from './insignias.routes.js';
 import AuthRoutes from './auth.routes.js';
 import MonthlyAchievementsRoutes from './monthlyAchievements.routes.js';
-import userCustomizationsRoutes from './customization.routes.js'; // nome corrigido
+import CustomizationsRoutes from './customization.routes.js'; // nome corrigido
 import achievementsRoutes from './achievements.routes.js'; // nome corrigido
 import UserInsigniasRoutes from './user_insignias.routes.js';
 import ConfigRoutes from './config.routes.js';
@@ -26,6 +26,9 @@ import StreakRoutes from './streak.routes.js';
 import BlocksRoutes from './blocks.routes.js';
 import NotificationsRoutes from './notifications.routes.js';
 import PrivacySettingsRoutes from './privacy_settings.routes.js';
+import userCustomizationsRoutes from './user_customizations.routes.js'; // Importando as rotas de customização de usuário
+import themesRoutes from './themes.routes.js'; // Importando as rotas de temas
+import UserAchievementsRoutes from './user_achievements.routes.js';
 
 // Usando as rotas com o `router`
 router.use("/payment", paymentRoutes);
@@ -41,9 +44,9 @@ router.use("/user-quests", RoutesUserQuests);
 router.use("/rewards", RoutesRewards);
 router.use("/achievements", achievementsRoutes);
 router.use("/insignias", RoutesInsignias);
-router.use("/customization", userCustomizationsRoutes);
+router.use("/customization", CustomizationsRoutes);
 router.use('/auth', AuthRoutes);
-router.use('/user-achievements', MonthlyAchievementsRoutes);
+router.use('/user-Monthlyachievements', MonthlyAchievementsRoutes);
 router.use("/user-insignias", UserInsigniasRoutes)
 router.use("/config", ConfigRoutes);
 router.use("/user-profiles", UserProfilesRoutes); // Usando as rotas de perfis de usuário
@@ -52,5 +55,8 @@ router.use("/streak", StreakRoutes);
 router.use("/blocks", BlocksRoutes);
 router.use("/notifications", NotificationsRoutes);
 router.use("/privacy-settings", PrivacySettingsRoutes);
+router.use("/user-customizations", userCustomizationsRoutes); // Usando as rotas de customização de usuário
+router.use("/themes", themesRoutes);
+router.use('/user-achievements', UserAchievementsRoutes);
 
 export default router;

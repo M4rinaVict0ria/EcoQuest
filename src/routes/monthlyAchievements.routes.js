@@ -4,7 +4,7 @@ import MonthlyAchievementsController from '../controllers/monthlyAchievements.co
 
 const router = express.Router();
 
-// Endpoint para disparar a atribuição automática da conquista mensal
-router.post('/user-achievements/assign-monthly', MonthlyAchievementsController.assignMonthlyAchievements);
+// Correção aqui: só coloque "/assign-monthly"
+router.post('/assign-monthly', MonthlyAchievementsController.assignMonthlyAchievements);
 
 export default router;

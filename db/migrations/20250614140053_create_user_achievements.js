@@ -1,4 +1,3 @@
-// migrations/YYYYMMDDHHMMSS_create_user_achievements.js
 export async function up(knex) {
   await knex.schema.createTable("user_achievements", (table) => {
     table.increments("id").primary();
@@ -7,9 +6,11 @@ export async function up(knex) {
     table.integer("achievement_id").unsigned().notNullable()
       .references("id").inTable("achievements").onDelete("CASCADE");
     table.date("unlocked_at").notNullable().defaultTo(knex.fn.now());
+    table.integer("month").nullable(); // Exemplo: 202306 (YYYYMM)
     table.timestamps(true, true);
 
-    table.unique(["user_id", "achievement_id"]); // evita duplicatas
+    // Índice único considerando o mês para conquistas mensais
+    table.unique(["user_id", "achievement_id", "month"], "unique_user_achievement_month");
   });
 }
 

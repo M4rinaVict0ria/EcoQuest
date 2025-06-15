@@ -1,71 +1,74 @@
-// src/controllers/achievements.controller.js
 import { z } from "zod";
 
-const AchievementSchema = z.object({
-  user_id: z.number(),
-  title: z.string(),
-  description: z.string(),
-  month: z.string(),
+const CustomizationSchema = z.object({
+  id: z.number().int(),
+  type: z.enum(['banner', 'moldura', 'foto']),
+  name: z.string(),
+  imageUrl: z.string().url(),
 });
 
-let achievements = [];
-let nextId = 1;
+let customizations = [
+  { id: 1, type: 'banner', name: 'Banner Verde', imageUrl: 'https://example.com/banner-verde.png' },
+  { id: 2, type: 'moldura', name: 'Moldura Ouro', imageUrl: 'https://example.com/moldura-ouro.png' },
+  { id: 3, type: 'foto', name: 'Foto de Perfil 1', imageUrl: 'https://example.com/foto1.png' },
+];
 
-const AchievementsController = {
-  // Listar todas conquistas
+let nextId = 4;
+
+const CustomizationController = {
   getAll(req, res) {
-    res.json(achievements);
+    res.json(customizations);
   },
 
-  // Ver detalhes de uma conquista por ID
   getById(req, res) {
     const id = Number(req.params.id);
-    const achievement = achievements.find((a) => a.id === id);
-    if (!achievement) {
-      return res.status(404).json({ message: "Conquista não encontrada" });
-    }
-    res.json(achievement);
+    const item = customizations.find(c => c.id === id);
+    if (!item) return res.status(404).json({ message: 'Customização não encontrada' });
+    res.json(item);
   },
 
-  // Criar nova conquista
   create(req, res) {
     try {
-      const data = AchievementSchema.parse(req.body);
-      const newAchievement = { id: nextId++, ...data };
-      achievements.push(newAchievement);
-      res.status(201).json(newAchievement);
+      const data = req.body;
+      const newCustomization = {
+        id: nextId++,
+        type: data.type,
+        name: data.name,
+        imageUrl: data.imageUrl,
+      };
+
+      CustomizationSchema.parse(newCustomization);
+      customizations.push(newCustomization);
+
+      res.status(201).json(newCustomization);
     } catch (error) {
-      res.status(400).json({ error: error.errors });
+      res.status(400).json({ message: 'Erro na validação', errors: error.errors || error.message });
     }
   },
 
-  // Atualizar conquista por ID
   update(req, res) {
     const id = Number(req.params.id);
-    const index = achievements.findIndex((a) => a.id === id);
-    if (index === -1) {
-      return res.status(404).json({ message: "Conquista não encontrada" });
-    }
+    const index = customizations.findIndex(c => c.id === id);
+    if (index === -1) return res.status(404).json({ message: 'Customização não encontrada' });
 
     try {
-      const data = AchievementSchema.partial().parse(req.body); // permite atualizar parcialmente
-      achievements[index] = { ...achievements[index], ...data };
-      res.json(achievements[index]);
+      const data = req.body;
+      const updated = { ...customizations[index], ...data };
+      CustomizationSchema.parse(updated);
+      customizations[index] = updated;
+      res.json(updated);
     } catch (error) {
-      res.status(400).json({ error: error.errors });
+      res.status(400).json({ message: 'Erro na validação', errors: error.errors || error.message });
     }
   },
 
-  // Remover conquista por ID
   delete(req, res) {
     const id = Number(req.params.id);
-    const index = achievements.findIndex((a) => a.id === id);
-    if (index === -1) {
-      return res.status(404).json({ message: "Conquista não encontrada" });
-    }
-    achievements.splice(index, 1);
-    res.json({ message: "Conquista removida com sucesso" });
+    const index = customizations.findIndex(c => c.id === id);
+    if (index === -1) return res.status(404).json({ message: 'Customização não encontrada' });
+    customizations.splice(index, 1);
+    res.json({ message: 'Customização removida' });
   },
 };
 
-export default AchievementsController;
+export default CustomizationController;

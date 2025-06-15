@@ -7,6 +7,11 @@ export async function up(knex) {
     table.string("frame").nullable(); // nome da moldura
     table.string("profile_color").nullable(); // cor do perfil, ex: '#00FF00'
     table.timestamps(true, true);
+    table.integer('eco_points').defaultTo(0);
+    table.integer('flora_coins').defaultTo(0);
+    table.boolean('is_private').defaultTo(false);
+    table.integer('current_streak').defaultTo(0);
+
   });
 }
 

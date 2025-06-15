@@ -1,5 +1,3 @@
-// src/controllers/streak.controller.js
-
 import db from '../../db/connection.js';
 
 class StreakController {
@@ -20,30 +18,39 @@ class StreakController {
   }
 
   static async incrementStreak(req, res) {
-  const { user_id } = req.params;
-  try {
-    const updated = await db('user_profiles')
-      .where({ user_id })
-      .increment('current_streak', 1)
-      .returning('current_streak');
-    
-    if (!updated.length) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
-    }
+    const { user_id } = req.params;
+    try {
+      // Incrementa o streak (retorna número de linhas afetadas)
+      const rowsUpdated = await db('user_profiles')
+        .where({ user_id })
+        .increment('current_streak', 1);
 
-    res.json({ message: 'Streak incrementado', streak: updated[0] });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao incrementar streak', error });
+      if (rowsUpdated === 0) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
+      // Busca o valor atualizado do streak
+      const updatedProfile = await db('user_profiles')
+        .where({ user_id })
+        .first();
+
+      res.json({ message: 'Streak incrementado', streak: updatedProfile.current_streak });
+    } catch (error) {
+      res.status(500).json({ message: 'Erro ao incrementar streak', error });
+    }
   }
-}
 
   static async resetStreak(req, res) {
     const { user_id } = req.params;
 
     try {
-      await db('user_profiles')
+      const rowsUpdated = await db('user_profiles')
         .where({ user_id })
         .update({ current_streak: 0 });
+
+      if (rowsUpdated === 0) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
 
       res.json({ message: 'Streak resetado com sucesso' });
     } catch (error) {

@@ -7,10 +7,13 @@ const privacySchema = z.object({
 
 class PrivacySettingsController {
   static async getPrivacy(req, res) {
-    const { user_id } = req.params;
+    const userId = Number(req.params.user_id);
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'ID de usuário inválido' });
+    }
 
     try {
-      const profile = await db('user_profiles').where({ user_id }).first();
+      const profile = await db('user_profiles').where({ user_id: userId }).first();
 
       if (!profile) {
         return res.status(404).json({ message: 'Usuário não encontrado' });
@@ -23,12 +26,19 @@ class PrivacySettingsController {
   }
 
   static async updatePrivacy(req, res) {
-    const { user_id } = req.params;
+    const userId = Number(req.params.user_id);
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'ID de usuário inválido' });
+    }
 
     try {
       const data = privacySchema.parse(req.body);
 
-      await db('user_profiles').where({ user_id }).update(data);
+      const updated = await db('user_profiles').where({ user_id: userId }).update(data);
+
+      if (updated === 0) {
+        return res.status(404).json({ message: 'Usuário não encontrado para atualizar privacidade' });
+      }
 
       res.json({ message: 'Privacidade atualizada com sucesso' });
     } catch (error) {

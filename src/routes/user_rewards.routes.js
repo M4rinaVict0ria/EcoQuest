@@ -3,8 +3,8 @@ import UserRewardController from "../controllers/user_rewards.controller.js";
 
 const router = express.Router();
 
-router.post("/users/:user_id/rewards", UserRewardController.create);
-router.get("/user-rewards/unlock", UserRewardController.getAll);
-router.delete("/user_rewards/:id", UserRewardController.delete);
+router.post("/:user_id/rewards", UserRewardController.create);
+router.get("/unlock", UserRewardController.getAll);                  // GET /api/user-rewards/unlock
+router.delete("/:id", UserRewardController.delete);  
 
 export default router;

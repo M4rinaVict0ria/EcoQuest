@@ -4,8 +4,11 @@ export async function up(knex) {
     table.increments("id").primary();
     table.date("date").notNullable();
     table.string("receipt").notNullable().unique();
-    table.decimal("amount", 10, 2).notNullable(); // valor pago
-    table.text("note").nullable(); // observações
+    table.decimal("amount", 10, 2).notNullable();
+    table.text("note").nullable();
+    table.integer("user_id").unsigned().notNullable()
+      .references("id").inTable("users").onDelete("CASCADE");
+    table.string("status").defaultTo('pending'); // status padrão
     table.timestamps(true, true);
   });
 }

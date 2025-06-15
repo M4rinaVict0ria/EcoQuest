@@ -24,4 +24,10 @@ router.get("/:id/followers", UsersController.getFollowers);
 // Ver quem o usuário segue
 router.get("/:id/following", UsersController.getFollowing);
 
+// Seguir um usuário
+router.post("/:id/follow/:targetId", UsersController.followUser);
+
+// Deixar de seguir um usuário
+router.delete("/:id/unfollow/:targetId", UsersController.unfollowUser);
+
 export default router;

@@ -3,9 +3,9 @@ import db from '../../db/connection.js';
 const MonthlyAchievementController = {
   async assignMonthlyAchievements(req, res) {
     try {
-      // Busca a conquista mensal (type = 'monthly')
+      // Busca a conquista mensal
       const monthlyAchievement = await db('achievements')
-        .where('type', 'monthly')
+        .where('is_monthly', true)
         .first();
 
       if (!monthlyAchievement) {
@@ -17,18 +17,19 @@ const MonthlyAchievementController = {
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-      // Busca todos usuários que completaram quests diárias no mês atual,
-      // conta quantas quests diárias completaram por usuário
+      // Busca usuários que completaram pelo menos 30 quests diárias no mês atual
       const usersWithCounts = await db('user_quests')
-        .select('user_id')
-        .count('id as completedCount')
-        .where('completed_at', '>=', firstDay)
-        .andWhere('completed_at', '<=', lastDay)
-        .andWhere('type', 'daily') // considera só quests diárias
-        .groupBy('user_id')
+        .join('quests', 'user_quests.quest_id', 'quests.id')
+        .select('user_quests.user_id')
+        .count('user_quests.id as completedCount')
+        .where('user_quests.completed', true)
+        .andWhere('user_quests.completed_at', '>=', firstDay)
+        .andWhere('user_quests.completed_at', '<=', lastDay)
+        .andWhere('quests.type', 'daily')
+        .groupBy('user_quests.user_id')
         .having('completedCount', '>=', 30);
 
-      // Atribui a conquista mensal para usuários que ainda não receberam
+      // Atribui a conquista para quem ainda não tem
       for (const user of usersWithCounts) {
         const alreadyHas = await db('user_achievements')
           .where({ user_id: user.user_id, achievement_id: monthlyAchievement.id })

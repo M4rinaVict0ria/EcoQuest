@@ -3,16 +3,16 @@ import PracticesController from "../controllers/practices.controller.js";
 
 const router = express.Router();
 
-// Listar práticas de um tema
-router.get("/themes/:theme_id/practices", PracticesController.getAllByTheme);
+// Listar práticas de um tema (GET /practices/themes/:theme_id)
+router.get("/themes/:theme_id", PracticesController.getAllByTheme);
 
-// Detalhar prática
-router.get("/practices/:id", PracticesController.getById);
+// Detalhar prática (GET /practices/:id)
+router.get("/:id", PracticesController.getById);
 
-// Criar prática (admin)
-router.post("/practices", PracticesController.create);
+// Criar prática (POST /practices)
+router.post("/", PracticesController.create);
 
-// Atualizar prática (admin)
-router.put("/practices/:id", PracticesController.update);
+// Atualizar prática (PUT /practices/:id)
+router.put("/:id", PracticesController.update);
 
 export default router;

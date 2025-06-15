@@ -9,7 +9,7 @@ export async function up(knex) {
     table.boolean("completed").defaultTo(false); // indica se foi concluída
     table.date("completed_at").nullable(); // data de conclusão (se aplicável)
     table.timestamps(true, true);
-
+    table.integer('progress').notNullable().defaultTo(0);
     table.unique(["user_id", "quest_id"]); // um usuário só pode ter uma entrada por missão
   });
 }

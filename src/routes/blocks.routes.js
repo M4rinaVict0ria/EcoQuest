@@ -5,7 +5,7 @@ import BlocksController from '../controllers/blocks.controller.js';
 
 const router = express.Router();
 
-router.post('/blocks', BlocksController.blockUser);
-router.delete('/blocks/:id', BlocksController.unblockUser);
+router.post('/', BlocksController.blockUser);
+router.delete('/:id', BlocksController.unblockUser);
 
 export default router;

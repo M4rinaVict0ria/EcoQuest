@@ -1,5 +1,3 @@
-// src/controllers/notifications.controller.js
-
 import db from '../../db/connection.js';
 
 class NotificationsController {
@@ -13,7 +11,39 @@ class NotificationsController {
 
       res.json(notifications);
     } catch (error) {
-      res.status(500).json({ message: 'Erro ao buscar notificações', error });
+      console.error('Erro ao buscar notificações:', error);
+      res.status(500).json({
+        message: 'Erro ao buscar notificações',
+        error: error.message || error.toString(),
+      });
+    }
+  }
+
+  static async createNotification(req, res) {
+    const { user_id, title, message } = req.body;
+
+    if (!user_id || !title || !message) {
+      return res.status(400).json({ message: 'Campos user_id, title e message são obrigatórios' });
+    }
+
+    try {
+      const [id] = await db('notifications').insert({
+        user_id,
+        title,
+        message,
+        read: false,
+        sent_at: new Date()
+      });
+
+      const newNotification = await db('notifications').where({ id }).first();
+
+      res.status(201).json(newNotification);
+    } catch (error) {
+      console.error('Erro ao criar notificação:', error);
+      res.status(500).json({
+        message: 'Erro ao criar notificação',
+        error: error.message || error.toString(),
+      });
     }
   }
 
@@ -31,7 +61,11 @@ class NotificationsController {
 
       res.json({ message: 'Notificação marcada como lida' });
     } catch (error) {
-      res.status(500).json({ message: 'Erro ao atualizar notificação', error });
+      console.error('Erro ao atualizar notificação:', error);
+      res.status(500).json({
+        message: 'Erro ao atualizar notificação',
+        error: error.message || error.toString(),
+      });
     }
   }
 
@@ -39,7 +73,9 @@ class NotificationsController {
     const { id } = req.params;
 
     try {
-      const deleted = await db('notifications').where({ id }).del();
+      const deleted = await db('notifications')
+        .where({ id })
+        .del();
 
       if (!deleted) {
         return res.status(404).json({ message: 'Notificação não encontrada' });
@@ -47,7 +83,11 @@ class NotificationsController {
 
       res.json({ message: 'Notificação removida com sucesso' });
     } catch (error) {
-      res.status(500).json({ message: 'Erro ao remover notificação', error });
+      console.error('Erro ao remover notificação:', error);
+      res.status(500).json({
+        message: 'Erro ao remover notificação',
+        error: error.message || error.toString(),
+      });
     }
   }
 }

@@ -3,8 +3,8 @@ import QuestController from "../controllers/quest.controller.js";
 
 const router = express.Router();
 
-router.get("/quests", QuestController.getAll);
-router.get("/quests/:id", QuestController.getById);
-router.post("/quests", QuestController.create); // opcional, admin
+router.get("/", QuestController.getAll);
+router.get("/:id", QuestController.getById);
+router.post("/", QuestController.create);
 
 export default router;

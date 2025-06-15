@@ -5,8 +5,9 @@ import StreakController from '../controllers/streak.controller.js';
 
 const router = express.Router();
 
-router.get('/users/:user_id/streak', StreakController.getStreak);
-router.post('/users/:user_id/streak/increment', StreakController.incrementStreak);
-router.post('/users/:user_id/streak/reset', StreakController.resetStreak);
+router.get('/:user_id', StreakController.getStreak);
+router.post('/:user_id/increment', StreakController.incrementStreak);
+router.post('/:user_id/reset', StreakController.resetStreak);
+
 
 export default router;

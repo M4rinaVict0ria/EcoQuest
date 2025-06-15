@@ -1,11 +1,10 @@
 export async function up(knex) {
   return knex.schema.createTable('quests', (table) => {
     table.increments('id').primary();
-    table.string('title');
+    table.string('title').notNullable();
     table.text('description');
-    table.boolean('completed').defaultTo(false);
-    table.timestamp('completed_at').nullable();
-    table.integer('user_id').unsigned().references('id').inTable('users');
+    table.string('type').notNullable().defaultTo('daily'); // ex: daily, weekly, monthly
+    table.integer('xp_bonus').defaultTo(0);
     table.timestamps(true, true);
   });
 }

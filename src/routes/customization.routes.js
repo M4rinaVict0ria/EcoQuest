@@ -1,12 +1,12 @@
-import express from "express";
-import AchievementsController from "../controllers/achievements.controller.js";
+import express from 'express';
+import CustomizationController from '../controllers/customization.controller.js';
 
 const router = express.Router();
 
-router.get("/achievements", AchievementsController.getAll);
-router.get("/achievements/:id", AchievementsController.getById);
-router.post("/achievements", AchievementsController.create);
-router.put("/achievements/:id", AchievementsController.update);
-router.delete("/achievements/:id", AchievementsController.delete);
+router.get('/', CustomizationController.getAll);
+router.get('/:id', CustomizationController.getById);
+router.post('/', CustomizationController.create);
+router.put('/:id', CustomizationController.update);
+router.delete('/:id', CustomizationController.delete);
 
 export default router;

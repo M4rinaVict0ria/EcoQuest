@@ -1,4 +1,3 @@
-import db from '../../db/connection.js';
 import { z } from "zod";
 
 const UserSchema = z.object({
@@ -24,10 +23,8 @@ const UsersController = {
     try {
       const { nome, email, senha } = req.body;
 
-      // Validação
       UserSchema.parse({ nome, email, senha });
 
-      // Verificar email duplicado
       const emailExists = usuarios.some(u => u.email === email);
       if (emailExists) {
         return res.status(400).json({ message: 'Email já cadastrado.' });
@@ -44,7 +41,6 @@ const UsersController = {
 
       usuarios.push(novoUsuario);
 
-      // Inicializa seguidores e seguindo para esse usuário
       seguidoresMap.set(novoUsuario.id, []);
       seguindoMap.set(novoUsuario.id, []);
 
@@ -73,24 +69,21 @@ const UsersController = {
   },
 
   getUserById(req, res) {
-    const { id } = req.params;
-    const userId = Number(id);
+    const userId = Number(req.params.id);
 
     const user = usuarios.find(u => u.id === userId);
     if (!user) return res.status(404).json({ message: 'Usuário não encontrado.' });
 
-    // Exemplo de dados extras que você pode colocar aqui
     const profile = {
       id: user.id,
       nome: user.nome,
       email: user.email,
       pontos: user.pontos,
       missoesConcluidas: user.missoesConcluidas,
-      // Dados fictícios para seguidores, seguindo, nível, progresso
       seguidoresCount: seguidoresMap.get(userId)?.length || 0,
       seguindoCount: seguindoMap.get(userId)?.length || 0,
       nivel: 1,
-      progressoNivel: 50 // %
+      progressoNivel: 50
     };
 
     return res.status(200).json(profile);
@@ -98,17 +91,14 @@ const UsersController = {
 
   async updateUser(req, res) {
     try {
-      const { id } = req.params;
-      const userId = Number(id);
+      const userId = Number(req.params.id);
       const updateData = req.body;
 
-      // Validação parcial
       UpdateUserSchema.parse(updateData);
 
       const userIndex = usuarios.findIndex(u => u.id === userId);
       if (userIndex === -1) return res.status(404).json({ message: 'Usuário não encontrado.' });
 
-      // Se atualizar email, checar duplicidade
       if (updateData.email) {
         const emailExists = usuarios.some(u => u.email === updateData.email && u.id !== userId);
         if (emailExists) {
@@ -116,7 +106,6 @@ const UsersController = {
         }
       }
 
-      // Atualiza campos (senha atualizada aqui diretamente, mas pode ser melhor hash se quiser)
       usuarios[userIndex] = { ...usuarios[userIndex], ...updateData };
 
       const { senha, ...userSafe } = usuarios[userIndex];
@@ -133,8 +122,7 @@ const UsersController = {
   },
 
   deleteUser(req, res) {
-    const { id } = req.params;
-    const userId = Number(id);
+    const userId = Number(req.params.id);
 
     const userIndex = usuarios.findIndex(u => u.id === userId);
     if (userIndex === -1) return res.status(404).json({ message: 'Usuário não encontrado.' });
@@ -144,12 +132,19 @@ const UsersController = {
     seguidoresMap.delete(userId);
     seguindoMap.delete(userId);
 
+    // Remover este usuário das listas de seguidores e seguindo dos outros usuários
+    seguidoresMap.forEach((seguidores, key) => {
+      seguidoresMap.set(key, seguidores.filter(id => id !== userId));
+    });
+    seguindoMap.forEach((seguindo, key) => {
+      seguindoMap.set(key, seguindo.filter(id => id !== userId));
+    });
+
     return res.status(200).json({ message: 'Usuário deletado com sucesso.' });
   },
 
   getFollowers(req, res) {
-    const { id } = req.params;
-    const userId = Number(id);
+    const userId = Number(req.params.id);
 
     if (!seguidoresMap.has(userId)) {
       return res.status(404).json({ message: 'Usuário não encontrado.' });
@@ -165,8 +160,7 @@ const UsersController = {
   },
 
   getFollowing(req, res) {
-    const { id } = req.params;
-    const userId = Number(id);
+    const userId = Number(req.params.id);
 
     if (!seguindoMap.has(userId)) {
       return res.status(404).json({ message: 'Usuário não encontrado.' });
@@ -179,6 +173,60 @@ const UsersController = {
     }).filter(Boolean);
 
     return res.status(200).json(seguindo);
+  },
+
+  followUser(req, res) {
+    const userId = Number(req.params.id);
+    const targetId = Number(req.params.targetId);
+
+    if (userId === targetId) {
+      return res.status(400).json({ message: "Você não pode seguir a si mesmo." });
+    }
+
+    const userExists = usuarios.some(u => u.id === userId);
+    const targetExists = usuarios.some(u => u.id === targetId);
+
+    if (!userExists || !targetExists) {
+      return res.status(404).json({ message: "Usuário ou usuário alvo não encontrado." });
+    }
+
+    const seguindo = seguindoMap.get(userId) || [];
+    if (seguindo.includes(targetId)) {
+      return res.status(400).json({ message: "Você já está seguindo esse usuário." });
+    }
+    seguindo.push(targetId);
+    seguindoMap.set(userId, seguindo);
+
+    const seguidores = seguidoresMap.get(targetId) || [];
+    seguidores.push(userId);
+    seguidoresMap.set(targetId, seguidores);
+
+    return res.status(200).json({ message: "Usuário seguido com sucesso." });
+  },
+
+  unfollowUser(req, res) {
+    const userId = Number(req.params.id);
+    const targetId = Number(req.params.targetId);
+
+    const userExists = usuarios.some(u => u.id === userId);
+    const targetExists = usuarios.some(u => u.id === targetId);
+
+    if (!userExists || !targetExists) {
+      return res.status(404).json({ message: "Usuário ou usuário alvo não encontrado." });
+    }
+
+    let seguindo = seguindoMap.get(userId) || [];
+    if (!seguindo.includes(targetId)) {
+      return res.status(400).json({ message: "Você não está seguindo esse usuário." });
+    }
+    seguindo = seguindo.filter(id => id !== targetId);
+    seguindoMap.set(userId, seguindo);
+
+    let seguidores = seguidoresMap.get(targetId) || [];
+    seguidores = seguidores.filter(id => id !== userId);
+    seguidoresMap.set(targetId, seguidores);
+
+    return res.status(200).json({ message: "Usuário deixou de seguir com sucesso." });
   }
 };
 

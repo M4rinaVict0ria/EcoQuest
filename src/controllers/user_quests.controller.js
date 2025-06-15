@@ -13,24 +13,28 @@ const updateProgressSchema = z.object({
 const UserQuestController = {
   async getUserQuests(req, res) {
     const userId = Number(req.params.user_id);
-    if (isNaN(userId)) return res.status(400).json({ error: 'user_id inválido' });
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'user_id inválido' });
+    }
 
     try {
       const quests = await db('user_quests')
         .where('user_id', userId)
         .select('id', 'quest_id', 'completed', 'completed_at', 'progress');
 
-      res.json(quests);
+      return res.json(quests);
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Erro ao buscar quests do usuário' });
+      console.error('Erro ao buscar quests do usuário:', error);
+      return res.status(500).json({ error: 'Erro ao buscar quests do usuário' });
     }
   },
 
   async completeQuest(req, res) {
     try {
       const questId = Number(req.params.quest_id);
-      if (isNaN(questId)) return res.status(400).json({ error: 'quest_id inválido' });
+      if (isNaN(questId)) {
+        return res.status(400).json({ error: 'quest_id inválido' });
+      }
 
       const parseResult = completeQuestSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -57,17 +61,23 @@ const UserQuestController = {
         progress: 100,
       });
 
-      res.status(201).json({ message: "Quest marcada como concluída", userQuestId: insertedId });
+      return res.status(201).json({ message: "Quest marcada como concluída", userQuestId: insertedId });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Erro ao marcar quest como concluída' });
+      console.error('Erro ao marcar quest como concluída:', error);
+      return res.status(500).json({ 
+        error: 'Erro ao marcar quest como concluída',
+        message: error.message,
+        stack: error.stack,
+      });
     }
   },
 
   async updateProgress(req, res) {
     try {
       const userQuestId = Number(req.params.id);
-      if (isNaN(userQuestId)) return res.status(400).json({ error: 'id inválido' });
+      if (isNaN(userQuestId)) {
+        return res.status(400).json({ error: 'id inválido' });
+      }
 
       const parseResult = updateProgressSchema.safeParse(req.body);
       if (!parseResult.success) {
@@ -82,10 +92,10 @@ const UserQuestController = {
 
       await db('user_quests').where('id', userQuestId).update({ progress: parseResult.data.progress });
 
-      res.json({ message: "Progresso atualizado" });
+      return res.json({ message: "Progresso atualizado" });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: 'Erro ao atualizar progresso' });
+      console.error('Erro ao atualizar progresso:', error);
+      return res.status(500).json({ error: 'Erro ao atualizar progresso' });
     }
   }
 };
