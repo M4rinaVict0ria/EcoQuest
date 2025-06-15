@@ -1,5 +1,3 @@
-// db/migrations/xxxx_add_type_to_quests.js
-
 export async function up(knex) {
   return knex.schema.alterTable('quests', (table) => {
     table.string('type').defaultTo('daily');

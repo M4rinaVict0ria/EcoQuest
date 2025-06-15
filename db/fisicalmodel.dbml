@@ -1,14 +1,14 @@
 Table users {
   id int [primary key, increment]
-  name varchar // Nome real
-  username varchar [unique, not null] // Nome de usuário (único)
+  name varchar
+  username varchar [unique, not null]
   email text [not null, unique]
-  password text [note: 'Min. 5 caracteres', default: '123456']
+  password text [note: 'Min. 5 caracteres', default:'123456']
   role varchar [default: 'user', note: 'admin/parcial/user']
-  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+   created_at timestamp [default: `CURRENT_TIMESTAMP`]
   updated_at timestamp
   xp int
-
+  
   Indexes {
     (email, password) [name: 'login']
     (username) [name: 'idx_username']

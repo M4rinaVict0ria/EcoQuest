@@ -3,6 +3,7 @@ export async function up(knex) {
     table.increments('id').primary();
     table.string('name');
     table.text('description');
+    table.boolean('is_monthly');
     table.timestamps(true, true);
   });
 }

@@ -1,11 +1,14 @@
-// knexfile.js
-export const development = {
+import path from 'path';
+
+export default {
+  development: {
     client: 'sqlite3',
     connection: {
-      filename: './db/db.sqlite3'
-    },
-    migrations: {
-      directory: './db/migrations'
+      filename: path.resolve('db', 'dev.sqlite3') // <- fora do src
     },
     useNullAsDefault: true,
+    migrations: {
+      directory: path.resolve('db', 'migrations') // <- fora do src
+    }
+  }
 };
